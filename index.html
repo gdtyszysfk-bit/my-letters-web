@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Write a Letter</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Satisfy&family=Dancing+Script&family=Caveat&family=DM+Sans&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f7f3ef;
+      text-align: center;
+      padding: 30px;
+      color: #5a4a42;
+    }
+
+    textarea, input, select {
+      width: 70%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #e8dcd1;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #5a4a42;
+      color: white;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    .paper {
+      padding: 30px;
+      max-width: 400px;
+      margin: 40px auto;
+      border-radius: 15px;
+      text-align: left;
+      white-space: pre-wrap;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .cream { background: #fffdfb; }
+    .pink { background: #fff0f3; }
+    .vintage { background: #f4ecd8; }
+
+    #content {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .signature {
+      margin-top: 25px;
+      text-align: right;
+      font-size: 30px;
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Write a Letter</h1>
+
+  <textarea id="inputText" placeholder="Write something..."></textarea>
+  <br>
+
+  <input id="nameInput" placeholder="Your name (signature)">
+  <br>
+
+  <select id="themeSelect">
+    <option value="cream">Cream</option>
+    <option value="pink">Pink</option>
+    <option value="vintage">Vintage</option>
+  </select>
+  <br>
+
+  <button onclick="createLetter()">Create Letter</button>
+  <button onclick="downloadImage()">Save Image</button>
+  <button onclick="shareToIG()">Share to IG</button>
+
+  <div id="letter">
+    <div id="paper" class="paper cream">
+      <p id="content"></p>
+    </div>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+  <script>
+    const signatureFonts = [
+      "'Great Vibes', cursive",
+      "'Satisfy', cursive",
+      "'Dancing Script', cursive",
+      "'Caveat', cursive"
+    ];
+
+    // ✍️ แปลงชื่อเป็นลายเซ็นสวย
+    function formatSignature(name) {
+      return name
+        .toLowerCase()
+        .trim()
+        .split(" ")
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+
+    function createLetter() {
+      const text = document.getElementById("inputText").value;
+      const name = document.getElementById("nameInput").value;
+      const content = document.getElementById("content");
+      const paper = document.getElementById("paper");
+      const theme = document.getElementById("themeSelect").value;
+
+      content.innerHTML = text;
+      paper.className = "paper " + theme;
+
+      const randomFont = signatureFonts[Math.floor(Math.random() * signatureFonts.length)];
+
+      if (name) {
+        const signature = document.createElement("div");
+        signature.className = "signature";
+        signature.innerText = formatSignature(name);
+
+        signature.style.fontFamily = randomFont;
+        signature.style.transform = `rotate(${Math.random()*6 - 3}deg)`;
+
+        content.appendChild(signature);
+      }
+    }
+
+    function downloadImage() {
+      html2canvas(document.getElementById("letter")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "my-letter.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    // 📱 แชร์ IG (mobile friendly)
+    function shareToIG() {
+      html2canvas(document.getElementById("letter")).then(canvas => {
+        canvas.toBlob(blob => {
+          const file = new File([blob], "letter.png", { type: "image/png" });
+
+          if (navigator.share) {
+            navigator.share({
+              files: [file],
+              title: "My Letter",
+            });
+          } else {
+            alert("Please use mobile to share to Instagram 📱");
+          }
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
